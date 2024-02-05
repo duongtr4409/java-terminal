@@ -35,10 +35,10 @@ jobs:
       IMAGE_TAG: latest
     steps:
       - setup_remote_docker
-      - checkout:
+      - checkout
+      - docker/check:
           docker-username: DOCKER_USER
           docker-password: DOCKER_PASS
-      - docker/check
       - docker/build:
           image: $IMAGE_NAME
           tag: $IMAGE_TAG
