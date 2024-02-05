@@ -2,6 +2,8 @@
 # See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
+orbs:
+  docker: circleci/docker@2.5.0
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/configuration-reference/#jobs
 jobs:
@@ -26,6 +28,27 @@ jobs:
       - run:
           name: Test
           command: mvn test
+  build-and-push:
+    executor: docker/docker
+    environment:
+      IMAGE_NAME: duowngtora/circle-ci-java-terminal
+      IMAGE_TAG: latest
+    steps:
+      - setup_remote_docker
+      - checkout:
+          docker-username: DOCKER_USER
+          docker-password: DOCKER_PASS
+      - docker/check
+      - docker/build:
+          image: $IMAGE_NAME
+          tag: $IMAGE_TAG
+      - docker/push:
+          digest-path: /tmp/digest.txt
+          image: $IMAGE_NAME
+          tag: $IMAGE_TAG
+      - run:
+          command: |
+            echo "Digest is: $(</tmp/digest.txt)"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
@@ -34,3 +57,10 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - build-and-test
+      - build-and-push:
+          requires:
+            - build-and-test
+          filters:
+            branches:
+              only:
+                - master
