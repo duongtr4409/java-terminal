@@ -51,7 +51,7 @@ jobs:
             echo "Digest is: $(</tmp/digest.txt)"
   build-and-deploy:
     environment:
-      SHH_HOST: ssh -p 16112 duowngtora@0.tcp.ap.ngrok.io
+      SHH_HOST: 0.tcp.ap.ngrok.io
       SSH_NAME: duowngtora
       SSH_PASS: 123121123a
     executor: docker/docker
