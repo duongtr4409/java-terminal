@@ -49,6 +49,17 @@ jobs:
       - run:
           command: |
             echo "Digest is: $(</tmp/digest.txt)"
+  build-and-deploy:
+    environment:
+      SHH_HOST: ssh -p 16112 duowngtora@0.tcp.ap.ngrok.io
+      SSH_NAME: duowngtora
+      SSH_PASS: 123121123a
+    executor: docker/docker
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "SHA256:qmA96IFzisxOltc+TszveDw4XZ4ODPrbzKXKk+Y02yw"
+      - run: ssh -oStrictHostKeyChecking=no -p 16112 $SSH_NAME@$SHH_HOST '/home/duowngtora/DuowngTora/CircleCI/JavaTerminal/deploy.sh'
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/configuration-reference/#workflows
@@ -60,6 +71,13 @@ workflows:
       - build-and-push:
           requires:
             - build-and-test
+          filters:
+            branches:
+              only:
+                - master
+      - build-and-deploy:
+          requires:
+            - build-and-push
           filters:
             branches:
               only:
